@@ -1,4 +1,3 @@
-// https://github.com/AsynkronIT/protoactor-go/blob/dev/examples/helloworld/main.go
 package main
 
 import (
@@ -23,3 +22,6 @@ func main() {
 	pid := actor.Spawn(props)
 	pid.Tell(&hello{Who: "Roger"})
 	console.ReadLine()
+}
+
+// https://github.com/AsynkronIT/protoactor-go/blob/dev/examples/helloworld/main.go

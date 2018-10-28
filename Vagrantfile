@@ -17,6 +17,7 @@ Vagrant.configure("2") do |config|
   end
   config.vm.synced_folder ".", "/vagrant", disabled: true
   config.vm.synced_folder "project/", "/project", mount_options: ["dmode=777,fmode=777"] #who cares
+  config.vm.synced_folder "project/example", "/home/Vagrant/go/src/example", mount_options: ["dmode=777,fmode=777"] #who cares
   
 
   config.vm.provision :ansible do |ansible|
