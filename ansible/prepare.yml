@@ -1,0 +1,41 @@
+
+
+- name: Clean-up
+  raw:  sudo rm -rf /etc/pacman.d/gnupg && sudo rm -rf /var/lib/pacman/db.lck
+
+
+- name: GPG keys
+  raw:  sudo pacman-key --init && sudo pacman-key --populate archlinux
+
+- name: "Install python on guest"
+  raw: "[ -e /usr/bin/python ] || (sudo pacman -Syu --noconfirm && sudo pacman -S --noconfirm python)"
+
+
+- name: "Gather facts"
+  setup:
+  
+- name: "Set term env var"
+  become: yes
+  become_user: root
+  raw: "echo 'TERM=xterm' > /etc/profile.d/term.sh"
+
+- name: Deps
+  become: yes
+  become_user: root
+  pacman:
+    name: base-devel, git, python, go, unzip, wget, gnu-netcat
+
+
+- name: Reboot 
+  become: yes
+  become_user: root
+  shell: "sleep 2 && reboot"
+  async: 1
+  poll: 0
+
+- name: Wait for the reboot to complete
+  wait_for_connection:
+    connect_timeout: 20
+    sleep: 5
+    delay: 5
+    timeout: 300
