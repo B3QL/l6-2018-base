@@ -16,8 +16,8 @@ Vagrant.configure("2") do |config|
     v.cpus = 2
   end
   config.vm.synced_folder ".", "/vagrant", disabled: true
-  config.vm.synced_folder "project/", "/project", mount_options: ["dmode=777,fmode=777"] #who cares
-  config.vm.synced_folder "project/example", "/home/vagrant/go/src/example", mount_options: ["dmode=777,fmode=777"] #who cares
+  # config.vm.synced_folder "project/", "/project", mount_options: ["dmode=777,fmode=777"] #who cares
+  config.vm.synced_folder "./project/go", "/home/vagrant/go", mount_options: ["dmode=777,fmode=777"] #who cares
   
 
   config.vm.provision :ansible do |ansible|
@@ -28,6 +28,4 @@ Vagrant.configure("2") do |config|
 
   # Shell scripts for Vagrant provisioning if you have problems with Ansible
   # config.vm.provision "update", type: "shell", path: "shell/update.sh"
-  # config.vm.provision :reload
-
 end
