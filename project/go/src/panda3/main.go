@@ -15,7 +15,8 @@ type InitMsg struct{
 	ActorsNumber, PartsNumber int
 	Data []int
 }
-type SortMsg struct{ Data []int}
+
+type SortMsg struct{ Data []int }
 type SortingActor struct{}
 
 func (state *SortingActor) Receive(context actor.Context) {
@@ -54,20 +55,26 @@ func (state *SupervisorActor) Receive(context actor.Context) {
 	case *SortMsg:
 		state.msgCounter--
 		fmt.Printf("[MASTER][Waiting for %d extra] Received sorted data %v\n", state.msgCounter, msg.Data)
-		if state.lastSortMsg == nil {
-			state.lastSortMsg = msg
-			if state.msgCounter == 0 {
-				fmt.Printf("[MASTER] Sending final result %v\n", msg.Data)
-				context.Tell(state.sender, msg.Data)
-			}
-		} else {
-			fmt.Printf("[MASTER] Merging presored data\n")
-			mergedData := append(state.lastSortMsg.Data, msg.Data...)
-			state.lastSortMsg = nil
-			state.msgCounter++
-			state.router.Request(&SortMsg{mergedData}, context.Self())
-			fmt.Printf("[MASTER] Sending merged data to actors\n")
+		if state.msgCounter == 0 {
+			fmt.Printf("[MASTER] Sending final result %v\n", msg.Data)
+			context.Tell(state.sender, msg.Data)
 		}
+		state.lastSortMsg = msg
+		context.PushBehavior(state.ReceiveSecondMsg)
+	}
+}
+
+func (state *SupervisorActor) ReceiveSecondMsg(context actor.Context) {
+	state.msgCounter--
+	switch msg := context.Message().(type) {
+	case *SortMsg:
+		fmt.Printf("[MASTER] Merging presored data\n")
+		mergedData := append(state.lastSortMsg.Data, msg.Data...)
+		state.lastSortMsg = nil
+		fmt.Printf("[MASTER] Sending merged data to actors\n")
+		state.msgCounter++
+		state.router.Request(&SortMsg{mergedData}, context.Self())
+		context.PopBehavior()
 	}
 }
 
